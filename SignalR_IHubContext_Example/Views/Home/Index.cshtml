@@ -1,0 +1,49 @@
+﻿@{
+    Layout = null;
+}
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <script src="~/microsoft/signalr/dist/browser/signalr.min.js">
+    </script>
+    <script src="~/jquery/dist/jquery.min.js"></script>
+
+    <script>
+
+        $(document).ready(() => {
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("https://localhost:44370/messagehub")
+                .build();
+
+            connection.start();
+
+
+            connection.on("receiverMessage", (message, user) => {
+                $("#messagesList").append(`${user}: ${message}<br />`);
+            });
+
+        });
+
+    </script>
+</head>
+<body>
+    <input type="text" id="txtUserName" value="" placeholder="Adınız..." />
+    <br />
+    <input type="text" id="txtMessage" value="" placeholder="Mesajınız..." />
+    <br />
+    <button type="submit" id="btnSendMessage">Gönder</button>
+    <div>
+        <ul id="messagesList">
+        </ul>
+    </div>
+
+    <div>
+        <ul id="clients">
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+﻿<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <script src="microsoft/signalr/dist/browser/signalr.min.js">
+    </script>
+    <script src="jquery/dist/jquery.min.js"></script>
+
+    <script>
+
+        $(document).ready(() => {
+
+            var connection = new signalR.HubConnectionBuilder().withUrl("http://localhost:4967/messagehub").build();
+            // var connection = new signalR.HubConnectionBuilder()
+            //     .withUrl("https://localhost:5001/messagehub")
+            //     .configureLogging(signalR.LogLevel.Information)
+            //     .withAutomaticReconnect([1000, 4000, 5000, 3000, 5000, 2000, 10, 1000])
+            //     .build();
+
+
+            connection.start();
+
+            $("#btnSendButton").click(() => {
+                let user = $("#txtUserName").val();
+                let message = $("#txtMassage").val();
+                connection.invoke("MessageAsync", message, user);
+            });
+
+            connection.on("receiverMessage", (message, user) => {
+                $("#messagesList").append(`${user}: ${message}<br />`);
+            });
+
+            //Server'a bağlanan tüm client'ları listeler
+            connection.on("clients", clients => {
+                let _client = "";
+                for (const client in clients) {
+                    lis += `<li>${clients[client]}</li>`;
+                }
+                $("#clients").html(_client);
+            });
+
+        });
+
+    </script>
+</head>
+<body>
+    <input type="text" id="txtUserName" value="" placeholder="Adınız..." />
+    <br />
+    <input type="text" id="txtMessage" value="" placeholder="Mesajınız..." />
+    <br />
+    <button type="submit" id="btnSendMessage">Gönder</button>
+    <div>
+        <ul id="messagesList">
+        </ul>
+    </div>
+
+    <div>
+        <ul id="clients">
+        </ul>
+    </div>
+</body>
+</html>
